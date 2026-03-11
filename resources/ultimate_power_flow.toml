@@ -1,0 +1,82 @@
+name = "Sovereign_Ultimate_JS_Forge"
+
+[[nodes]]
+id = "Strategic_Start"
+task_type = "mock"
+weight = 1.0
+params = {}
+
+[[nodes]]
+id = "SubProcess_Parallel_Scan"
+task_type = "mock"
+weight = 1.0
+params = {}
+
+[[nodes]]
+id = "LLM_Perspective_A"
+task_type = "llm"
+weight = 1.0
+params = {}
+[nodes.llm]
+model = "gpt-4"
+
+[[nodes]]
+id = "LLM_Perspective_B"
+task_type = "llm"
+weight = 1.0
+params = {}
+[nodes.llm]
+model = "claude-3"
+
+[[nodes]]
+id = "Parallel_Sync_Gateway"
+task_type = "router"
+weight = 1.0
+params = {}
+
+[[nodes]]
+id = "Professor_Audit_Audit"
+task_type = "formal_audit"
+weight = 1.0
+params = { max_retries = 10 }
+
+[[nodes]]
+id = "Strategic_End"
+task_type = "mock"
+weight = 1.0
+params = {}
+
+[[edges]]
+from = "Strategic_Start"
+to = "SubProcess_Parallel_Scan"
+weight = 1.0
+
+[[edges]]
+from = "SubProcess_Parallel_Scan"
+to = "LLM_Perspective_A"
+weight = 1.0
+
+[[edges]]
+from = "SubProcess_Parallel_Scan"
+to = "LLM_Perspective_B"
+weight = 1.0
+
+[[edges]]
+from = "LLM_Perspective_A"
+to = "Parallel_Sync_Gateway"
+weight = 1.0
+
+[[edges]]
+from = "LLM_Perspective_B"
+to = "Parallel_Sync_Gateway"
+weight = 1.0
+
+[[edges]]
+from = "Parallel_Sync_Gateway"
+to = "Professor_Audit_Audit"
+weight = 1.0
+
+[[edges]]
+from = "Professor_Audit_Audit"
+to = "Strategic_End"
+weight = 1.0

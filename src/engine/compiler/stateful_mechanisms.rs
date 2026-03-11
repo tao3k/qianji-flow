@@ -1,0 +1,116 @@
+use crate::contracts::{NodeDefinition, QianjiMechanism};
+use crate::error::QianjiError;
+use crate::executors::annotation::ContextAnnotator;
+use std::sync::Arc;
+use xiuxian_qianhuan::orchestrator::ThousandFacesOrchestrator;
+use xiuxian_qianhuan::persona::PersonaRegistry;
+
+use super::{annotation, formal_audit};
+
+#[cfg(feature = "llm")]
+use super::llm_node;
+#[cfg(feature = "llm")]
+use xiuxian_llm::llm::LlmClient;
+
+pub(super) fn annotation(
+    orchestrator: &Arc<ThousandFacesOrchestrator>,
+    registry: &Arc<PersonaRegistry>,
+    node_def: &NodeDefinition,
+) -> Arc<dyn QianjiMechanism> {
+    let cfg = annotation::mechanism_config(node_def);
+    Arc::new(ContextAnnotator {
+        orchestrator: Arc::clone(orchestrator),
+        registry: Arc::clone(registry),
+        persona_id: cfg.persona_id,
+        template_target: cfg.template_target,
+        execution_mode: cfg.execution_mode,
+        input_keys: cfg.input_keys,
+        history_key: cfg.history_key,
+        output_key: cfg.output_key,
+    })
+}
+
+#[cfg(feature = "llm")]
+pub(super) fn formal_audit_with_llm(
+    orchestrator: &Arc<ThousandFacesOrchestrator>,
+    registry: &Arc<PersonaRegistry>,
+    node_def: &NodeDefinition,
+    client: Arc<dyn LlmClient>,
+) -> Result<Arc<dyn QianjiMechanism>, QianjiError> {
+    let threshold_score = formal_audit::threshold_score(node_def)?;
+    let max_retries = formal_audit::max_retries(node_def)?;
+    let llm_config = llm_node::mechanism_config(node_def);
+    let annotation = annotation::mechanism_config(node_def);
+    let retry_target_ids = formal_audit::retry_targets(node_def);
+
+    Ok(Arc::new(
+        crate::executors::formal_audit::LlmAugmentedAuditMechanism {
+            annotator: ContextAnnotator {
+                orchestrator: Arc::clone(orchestrator),
+                registry: Arc::clone(registry),
+                persona_id: annotation.persona_id,
+                template_target: annotation.template_target,
+                execution_mode: annotation.execution_mode,
+                input_keys: annotation.input_keys,
+                history_key: annotation.history_key,
+                output_key: annotation.output_key,
+            },
+            client,
+            model: llm_config.model,
+            threshold_score,
+            max_retries,
+            retry_target_ids,
+            retry_counter_key: formal_audit::retry_counter_key(node_def),
+            output_key: formal_audit::output_key(node_def),
+            score_key: formal_audit::score_key(node_def),
+        },
+    ))
+}
+
+pub(super) fn formal_audit_native(node_def: &NodeDefinition) -> Arc<dyn QianjiMechanism> {
+    Arc::new(crate::executors::formal_audit::FormalAuditMechanism {
+        invariants: vec![crate::safety::logic::Invariant::MustBeGrounded],
+        retry_target_ids: formal_audit::retry_targets(node_def),
+    })
+}
+
+#[cfg(not(feature = "llm"))]
+pub(super) fn formal_audit_requires_llm_guard(
+    node_def: &NodeDefinition,
+) -> Result<(), QianjiError> {
+    if formal_audit::uses_llm_controller(node_def) {
+        return Err(QianjiError::Topology(
+            "Task type `formal_audit` with `[nodes.qianhuan] + [nodes.llm]` requires enabling feature `llm` for xiuxian-qianji.".to_string(),
+        ));
+    }
+    Ok(())
+}
+
+#[cfg(feature = "llm")]
+pub(super) fn llm(
+    orchestrator: &Arc<ThousandFacesOrchestrator>,
+    registry: &Arc<PersonaRegistry>,
+    node_def: &NodeDefinition,
+    client: Arc<dyn LlmClient>,
+) -> Arc<dyn QianjiMechanism> {
+    let llm_cfg = llm_node::mechanism_config(node_def);
+    let ann_cfg = annotation::mechanism_config(node_def);
+
+    Arc::new(crate::executors::llm::LlmAnalyzer {
+        client,
+        annotator: ContextAnnotator {
+            orchestrator: Arc::clone(orchestrator),
+            registry: Arc::clone(registry),
+            persona_id: ann_cfg.persona_id,
+            template_target: ann_cfg.template_target,
+            execution_mode: ann_cfg.execution_mode,
+            input_keys: ann_cfg.input_keys,
+            history_key: ann_cfg.history_key,
+            output_key: ann_cfg.output_key,
+        },
+        model: llm_cfg.model,
+        output_key: llm_cfg.output_key,
+        parse_json_output: llm_cfg.parse_json_output,
+        fallback_repo_tree_on_parse_failure: llm_cfg.fallback_repo_tree_on_parse_failure,
+    })
+}

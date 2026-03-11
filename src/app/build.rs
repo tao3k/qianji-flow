@@ -1,0 +1,24 @@
+use crate::QianjiLlmClient;
+use crate::consensus::ConsensusManager;
+use crate::engine::compiler::QianjiCompiler;
+use crate::error::QianjiError;
+use crate::scheduler::QianjiScheduler;
+use std::sync::Arc;
+use xiuxian_qianhuan::{orchestrator::ThousandFacesOrchestrator, persona::PersonaRegistry};
+use xiuxian_wendao::LinkGraphIndex;
+
+pub(super) fn compile_scheduler(
+    manifest_toml: &str,
+    index: Arc<LinkGraphIndex>,
+    orchestrator: Arc<ThousandFacesOrchestrator>,
+    registry: Arc<PersonaRegistry>,
+    llm_client: Option<Arc<QianjiLlmClient>>,
+    consensus_manager: Option<Arc<ConsensusManager>>,
+) -> Result<QianjiScheduler, QianjiError> {
+    let compiler = QianjiCompiler::new(index, orchestrator, registry, llm_client);
+    let engine = compiler.compile(manifest_toml)?;
+    Ok(QianjiScheduler::with_consensus_manager(
+        engine,
+        consensus_manager,
+    ))
+}

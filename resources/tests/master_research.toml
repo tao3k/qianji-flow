@@ -1,0 +1,20 @@
+name = "Master_Research_Test"
+
+[[nodes]]
+id = "Annotator"
+task_type = "annotation"
+weight = 1.0
+params = {}
+[nodes.qianhuan]
+persona_id = "artisan-engineer"
+
+[[nodes]]
+id = "Analyzer"
+task_type = "llm"
+weight = 1.0
+params = {}
+
+[[edges]]
+from = "Annotator"
+to = "Analyzer"
+weight = 1.0

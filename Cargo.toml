@@ -1,0 +1,57 @@
+[package]
+name = "xiuxian-qianji"
+version.workspace = true
+edition.workspace = true
+description = "Qianji (Thousand Mechanisms) - High-performance probabilistic workflow engine"
+authors.workspace = true
+license.workspace = true
+publish = false
+
+[features]
+default = []
+llm = ["dep:xiuxian-llm", "dep:reqwest"]
+pyo3 = ["dep:pyo3"]
+
+[dependencies]
+petgraph = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+toml = { workspace = true }
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+redis = { workspace = true, features = ["tokio-comp"] }
+log = { workspace = true }
+futures = { workspace = true }
+rand = { workspace = true }
+regex = "1"
+md5 = { workspace = true }
+include_dir = { workspace = true }
+xiuxian-wendao = { path = "../xiuxian-wendao" }
+xiuxian-qianhuan = { path = "../xiuxian-qianhuan" }
+xiuxian-ast = { path = "../xiuxian-ast" }
+xiuxian-macros = { path = "../xiuxian-macros" }
+xiuxian-zhenfa = { path = "../xiuxian-zhenfa" }
+xiuxian-logging = { path = "../xiuxian-logging" }
+xiuxian-llm = { path = "../xiuxian-llm", optional = true }
+xiuxian-window = { path = "../xiuxian-window" }
+pyo3 = { workspace = true, optional = true }
+reqwest = { workspace = true, optional = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+xiuxian-zhixing = { path = "../xiuxian-zhixing" }
+
+[lints]
+workspace = true
+
+[lib]
+name = "xiuxian_qianji"
+path = "src/lib.rs"
+
+[[bin]]
+name = "qianji"
+path = "src/bin/qianji.rs"
+required-features = ["llm"]

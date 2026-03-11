@@ -1,0 +1,66 @@
+name = "Sovereign_Ultimate_Forge_V2"
+
+[[nodes]]
+id = "Epistemic_Foundation"
+task_type = "mock"
+label = "Epistemic Foundation (Input)"
+weight = 1.0
+params = { context_uri = "$wendao://skills/paper-banana/references/epistemic_anchor.md" }
+
+[[nodes]]
+id = "Cognitive_Agent_Alpha"
+task_type = "llm"
+label = "Neural Agent Alpha"
+weight = 1.0
+params = { input_keys = ["Epistemic_Foundation"], context_uri = "$wendao://skills/paper-banana/references/cognitive_specs.md" }
+[nodes.llm]
+model = "gpt-4"
+
+[[nodes]]
+id = "Cognitive_Agent_Beta"
+task_type = "llm"
+label = "Neural Agent Beta"
+weight = 1.0
+params = { input_keys = ["Epistemic_Foundation"], context_uri = "$wendao://skills/paper-banana/references/cognitive_specs.md" }
+[nodes.llm]
+model = "claude-3"
+
+[[nodes]]
+id = "High_Rigor_Formal_Audit"
+task_type = "formal_audit"
+label = "Formal Validator"
+weight = 1.0
+params = { max_retries = 10, context_uri = "$wendao://skills/paper-banana/references/formal_validator.md" }
+
+[[nodes]]
+id = "Sovereign_Conclusion"
+task_type = "mock"
+label = "Sovereign Epistemic Conclusion"
+weight = 1.0
+params = {}
+
+[[edges]]
+from = "Epistemic_Foundation"
+to = "Cognitive_Agent_Alpha"
+weight = 1.0
+
+[[edges]]
+from = "Epistemic_Foundation"
+to = "Cognitive_Agent_Beta"
+weight = 1.0
+
+[[edges]]
+from = "Cognitive_Agent_Alpha"
+to = "High_Rigor_Formal_Audit"
+weight = 1.0
+
+[[edges]]
+from = "Cognitive_Agent_Beta"
+to = "High_Rigor_Formal_Audit"
+weight = 1.0
+
+[[edges]]
+from = "High_Rigor_Formal_Audit"
+to = "Sovereign_Conclusion"
+label = "SUCCESS"
+weight = 1.0

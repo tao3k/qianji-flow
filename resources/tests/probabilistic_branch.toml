@@ -1,0 +1,27 @@
+name = "Branch_Test"
+[[nodes]]
+id = "Router"
+task_type = "router"
+weight = 1.0
+params = { branches = [ ["PathA", 1.0], ["PathB", 0.0] ] }
+[[nodes]]
+id = "BranchA"
+task_type = "mock"
+weight = 1.0
+params = {}
+[[nodes]]
+id = "BranchB"
+task_type = "mock"
+weight = 1.0
+params = {}
+
+[[edges]]
+from = "Router"
+to = "BranchA"
+label = "PathA"
+weight = 1.0
+[[edges]]
+from = "Router"
+to = "BranchB"
+label = "PathB"
+weight = 1.0

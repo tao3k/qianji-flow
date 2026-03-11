@@ -1,0 +1,53 @@
+name = "Master_Research_Array"
+
+[[nodes]]
+id = "Seeker"
+task_type = "knowledge"
+weight = 1.0
+params = { depth = 2 }
+
+[[nodes]]
+id = "Annotator"
+task_type = "annotation"
+weight = 1.0
+params = {}
+[nodes.qianhuan]
+persona_id = "artisan-engineer"
+
+[[nodes]]
+id = "Analyzer"
+task_type = "llm"
+weight = 1.0
+params = { role = "prospector" }
+
+[[nodes]]
+id = "Skeptic"
+task_type = "llm"
+weight = 1.0
+params = { role = "skeptic" }
+
+[[nodes]]
+id = "Calibrator"
+task_type = "calibration"
+weight = 1.0
+params = { target_node_id = "Seeker", threshold = 0.05 }
+
+[[edges]]
+from = "Seeker"
+to = "Annotator"
+weight = 1.0
+
+[[edges]]
+from = "Annotator"
+to = "Analyzer"
+weight = 1.0
+
+[[edges]]
+from = "Analyzer"
+to = "Skeptic"
+weight = 1.0
+
+[[edges]]
+from = "Skeptic"
+to = "Calibrator"
+weight = 1.0

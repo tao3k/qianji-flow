@@ -1,0 +1,67 @@
+name = "Qianji_JS_Academic_Aesthetic_Evolution_Forge"
+
+[[nodes]]
+id = "Knowledge_Retriever"
+task_type = "llm"
+label = "检索器：全量知识背景挖掘 | Retriever: Deep Context Mining"
+weight = 1.0
+params = { input_keys = ["User_Intent"] }
+
+[[nodes]]
+id = "Topology_Planner"
+task_type = "llm"
+label = "规划器：语义拓扑逻辑构建 | Planner: Semantic Topology"
+weight = 1.0
+params = { input_keys = ["Knowledge_Retriever"] }
+
+[[nodes]]
+id = "Aesthetic_Stylist"
+task_type = "llm"
+label = "风格师：学术美学精度注能 | Stylist: Aesthetic Infusion"
+weight = 1.0
+params = { input_keys = ["Topology_Planner"] }
+
+[[nodes]]
+id = "Academic_Critic_Audit"
+task_type = "formal_audit"
+label = "审计员：视觉逻辑双盲评审 | Critic: Double-Blind Audit"
+weight = 1.0
+params = { 
+    threshold_score = 0.98, 
+    eval_dimensions = ["忠实度/Faithfulness", "可读性/Readability", "学术美感/Aesthetics"],
+    max_cycles = 10 
+}
+
+[[nodes]]
+id = "Sovereign_Publish"
+task_type = "mock"
+label = "发布器：主权级成果归档 | Publisher: Sovereign Release"
+weight = 1.0
+
+[[edges]]
+from = "Knowledge_Retriever"
+to = "Topology_Planner"
+weight = 1.0
+
+[[edges]]
+from = "Topology_Planner"
+to = "Aesthetic_Stylist"
+weight = 1.0
+
+[[edges]]
+from = "Aesthetic_Stylist"
+to = "Academic_Critic_Audit"
+weight = 1.0
+
+# 🔄 核心演化环路 (The PaperBanana Recursive Loop)
+[[edges]]
+from = "Academic_Critic_Audit"
+to = "Sovereign_Publish"
+label = "通过：符合顶级期刊标准 | PASS: Journal Ready"
+weight = 0.9
+
+[[edges]]
+from = "Academic_Critic_Audit"
+to = "Topology_Planner"
+label = "重写：逻辑或美学未达标 | REJECT: Re-Planning Required"
+weight = 0.1

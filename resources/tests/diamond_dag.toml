@@ -1,0 +1,38 @@
+name = "Diamond_Execution_Test"
+[[nodes]]
+id = "A"
+task_type = "mock"
+weight = 1.0
+params = {}
+[[nodes]]
+id = "B"
+task_type = "mock"
+weight = 1.0
+params = {}
+[[nodes]]
+id = "C"
+task_type = "mock"
+weight = 1.0
+params = {}
+[[nodes]]
+id = "D"
+task_type = "mock"
+weight = 1.0
+params = {}
+
+[[edges]]
+from = "A"
+to = "B"
+weight = 1.0
+[[edges]]
+from = "A"
+to = "C"
+weight = 1.0
+[[edges]]
+from = "B"
+to = "D"
+weight = 1.0
+[[edges]]
+from = "C"
+to = "D"
+weight = 1.0

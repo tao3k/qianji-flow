@@ -1,0 +1,31 @@
+name = "Precision_Research_Array"
+
+[[nodes]]
+id = "Prospector"
+task_type = "knowledge"
+weight = 1.0
+params = { depth = 2 }
+
+[[nodes]]
+id = "Annotator"
+task_type = "annotation"
+weight = 1.0
+params = {}
+[nodes.qianhuan]
+persona_id = "artisan-engineer"
+
+[[nodes]]
+id = "Skeptic"
+task_type = "calibration"
+weight = 1.0
+params = { target_node_id = "Prospector", threshold = 0.5 }
+
+[[edges]]
+from = "Prospector"
+to = "Annotator"
+weight = 1.0
+
+[[edges]]
+from = "Annotator"
+to = "Skeptic"
+weight = 1.0

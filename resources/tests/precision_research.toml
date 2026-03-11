@@ -1,0 +1,20 @@
+name = "Precision_Research_Test"
+
+[[nodes]]
+id = "Annotator"
+task_type = "annotation"
+weight = 1.0
+params = {}
+[nodes.qianhuan]
+persona_id = "artisan-engineer"
+
+[[nodes]]
+id = "Skeptic"
+task_type = "calibration"
+weight = 1.0
+params = { target_node_id = "Annotator", threshold = 0.5 }
+
+[[edges]]
+from = "Annotator"
+to = "Skeptic"
+weight = 1.0

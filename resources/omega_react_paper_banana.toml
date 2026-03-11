@@ -1,0 +1,101 @@
+name = "Qianji_Live_Sovereign_Evolution"
+
+[[nodes]]
+id = "Sovereign_Data_Seed"
+task_type = "mock"
+label = "Seed: High-Rigor Topology"
+weight = 1.0
+[nodes.params]
+output_key = "raw_academic_context"
+[nodes.params.mock_output]
+User_Intent = "Forge ultimate academic topology for a multi-agent swarm system."
+traceability = "Directly derived from NeurIPS 2025 PaperBanana standards."
+architectural_consistency = "Validated against distributed consensus patterns."
+milimeter_level_alignment = "Targeting sub-pixel precision in Manhattan routing."
+audit_trail = "Initialized via Sovereign Forge loop."
+entities = ["Physical_Agents", "Swarm_Middleware", "Coordination_Layer", "Mission_Control"]
+relations = [
+    { from = "Physical_Agents", to = "Swarm_Middleware" },
+    { from = "Swarm_Middleware", to = "Coordination_Layer" },
+    { from = "Coordination_Layer", to = "Mission_Control" }
+]
+
+[[nodes]]
+id = "Topology_Stylist_Agent"
+task_type = "llm"
+label = "Generator: Aesthetic Refinement"
+weight = 1.0
+[nodes.params]
+input_keys = ["raw_academic_context"]
+[nodes.llm]
+# Default Sovereign LLM
+[nodes.qianhuan]
+persona_id = "$wendao://skills/paper-banana/references/neurips_stylist.md"
+output_key = "proposed_diagram_manifest"
+
+[[nodes]]
+id = "ThousandFaces_Blind_Critic"
+task_type = "llm" 
+label = "Critic: Raw Academic Audit"
+weight = 1.0
+[nodes.params]
+output_key = "critic_raw_reasoning"
+input_keys = ["proposed_diagram_manifest", "raw_academic_context"] 
+[nodes.llm]
+# Default Sovereign LLM
+[nodes.qianhuan]
+persona_id = "$wendao://skills/paper-banana/references/blind_reviewer.md"
+execution_mode = "isolated"
+
+[[nodes]]
+id = "Critic_Signal_Encoding"
+task_type = "annotation"
+label = "Lens: Signal Formatting"
+weight = 1.0
+[nodes.params]
+input_keys = ["critic_raw_reasoning"]
+output_key = "omega_confidence" 
+[nodes.qianhuan]
+template_target = "$wendao://skills/paper-banana/references/signal_lens.j2"
+
+[[nodes]]
+id = "Omega_Confidence_Router"
+task_type = "router"
+label = "Decision: Probabilistic Routing"
+weight = 1.0
+[nodes.params]
+routing_strategy = "omega_confidence_bias"
+
+[[nodes]]
+id = "Live_Lab_Deploy"
+task_type = "write_file"
+label = "Publisher: Qianji Studio Live Online"
+weight = 1.0
+[nodes.params]
+path = ".data/qianji-studio/public/latest_topology.json"
+content_key = "proposed_diagram_manifest"
+
+[[edges]]
+from = "Sovereign_Data_Seed"
+to = "Topology_Stylist_Agent"
+weight = 1.0
+
+[[edges]]
+from = "Topology_Stylist_Agent"
+to = "ThousandFaces_Blind_Critic"
+weight = 1.0
+
+[[edges]]
+from = "ThousandFaces_Blind_Critic"
+to = "Critic_Signal_Encoding"
+weight = 1.0
+
+[[edges]]
+from = "Critic_Signal_Encoding"
+to = "Omega_Confidence_Router"
+weight = 1.0
+
+[[edges]]
+from = "Omega_Confidence_Router"
+to = "Live_Lab_Deploy"
+weight = 10.0

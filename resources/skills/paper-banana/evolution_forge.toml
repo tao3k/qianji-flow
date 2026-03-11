@@ -1,0 +1,80 @@
+name = "Sovereign_Paper_Banana_Wendao_Augmented_Forge"
+
+[[nodes]]
+id = "Academic_Context_Retrieval"
+task_type = "annotation"
+weight = 1.0
+params = { execution_mode = "isolated" }
+[nodes.qianhuan]
+# 调用问道中的知识检索专家
+persona_id = "$wendao://skills/research/retriever_specialist.md"
+output_key = "retrieved_academic_context"
+input_keys = ["User_Intent", "wendao_search_results"]
+
+[[nodes]]
+id = "Logical_Topology_Planning"
+task_type = "annotation"
+weight = 1.0
+params = { execution_mode = "appended" }
+[nodes.qianhuan]
+# 调用问道中的逻辑架构师
+persona_id = "$wendao://skills/research/topology_architect.md"
+output_key = "planned_topology"
+input_keys = ["retrieved_academic_context"]
+
+[[nodes]]
+id = "Aesthetic_Refinement"
+task_type = "annotation"
+weight = 1.0
+params = { execution_mode = "appended" }
+[nodes.qianhuan]
+# 调用问道中的 NeurIPS 美学风格指南
+persona_id = "$wendao://skills/aesthetics/neurips_stylist.md"
+output_key = "stylized_manifest"
+input_keys = ["planned_topology"]
+
+[[nodes]]
+id = "High_Rigor_Double_Blind_Audit"
+task_type = "formal_audit"
+weight = 1.0
+params = { 
+    threshold_score = 0.98, 
+    max_retries = 10,
+    output_key = "audit_verdict", 
+    score_key = "aesthetic_purity_score" 
+}
+[nodes.qianhuan]
+# 调用问道中的形式化审计规范
+persona_id = "$wendao://skills/governance/formal_reviewer.md"
+output_key = "audit_trace"
+input_keys = ["stylized_manifest", "retrieved_academic_context"]
+
+[[nodes]]
+id = "Final_Sovereign_Release"
+task_type = "annotation"
+weight = 1.0
+params = { execution_mode = "appended" }
+[nodes.qianhuan]
+template_target = "$wendao://skills/paper-banana/final_diagram_template.j2"
+output_key = "ultimate_diagram_xml"
+input_keys = ["audit_verdict", "stylized_manifest"]
+
+[[edges]]
+from = "Academic_Context_Retrieval"
+to = "Logical_Topology_Planning"
+weight = 1.0
+
+[[edges]]
+from = "Logical_Topology_Planning"
+to = "Aesthetic_Refinement"
+weight = 1.0
+
+[[edges]]
+from = "Aesthetic_Refinement"
+to = "High_Rigor_Double_Blind_Audit"
+weight = 1.0
+
+[[edges]]
+from = "High_Rigor_Double_Blind_Audit"
+to = "Final_Sovereign_Release"
+weight = 1.0
