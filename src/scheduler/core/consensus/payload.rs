@@ -1,6 +1,6 @@
-use super::super::QianjiScheduler;
 use crate::consensus::ConsensusManager;
 use crate::error::QianjiError;
+use crate::scheduler::core::QianjiScheduler;
 
 impl QianjiScheduler {
     pub(super) async fn read_agreed_output(

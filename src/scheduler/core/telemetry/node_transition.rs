@@ -1,4 +1,4 @@
-use super::super::QianjiScheduler;
+use crate::scheduler::core::QianjiScheduler;
 use crate::telemetry::{NodeTransitionPhase, SwarmEvent, unix_millis_now};
 use petgraph::stable_graph::NodeIndex;
 

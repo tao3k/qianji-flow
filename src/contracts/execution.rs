@@ -21,7 +21,7 @@ pub enum NodeStatus {
 }
 
 /// Control instructions emitted by nodes to manipulate the workflow execution.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum FlowInstruction {
     /// Continue to next topological layer normally.

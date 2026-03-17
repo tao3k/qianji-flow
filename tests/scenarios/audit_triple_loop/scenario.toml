@@ -1,0 +1,20 @@
+# Scenario: Audit Triple Loop
+# Tests the Plan -> Execute -> Verify cycle with cognitive supervision
+
+[scenario]
+id = "audit_triple_loop"
+name = "Audit Triple Loop"
+description = "Test the complete Qianji audit flow with Plan-Execute-Verify cycle and cognitive supervision"
+category = "audit_flow"
+
+[input]
+type = "workflow"
+
+[runner]
+max_remediation_attempts = 5
+cognitive_early_halt = true
+coherence_threshold = 0.3
+
+[assert]
+supports_remediation_loop = true
+supports_cognitive_metrics = true

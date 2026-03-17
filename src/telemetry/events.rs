@@ -105,6 +105,38 @@ pub enum SwarmEvent {
         /// Event timestamp in UNIX milliseconds.
         timestamp_ms: u64,
     },
+    /// Cognitive supervision metrics emitted during LLM streaming.
+    CognitivePulse {
+        /// Logical swarm session identifier.
+        session_id: Option<String>,
+        /// Node identifier from compiled flow graph.
+        node_id: String,
+        /// Current coherence score (0.0 to 1.0).
+        coherence: f32,
+        /// Whether early halt was triggered.
+        early_halt_triggered: bool,
+        /// Cognitive distribution metrics.
+        distribution: CognitiveDistributionMetrics,
+        /// Event timestamp in UNIX milliseconds.
+        timestamp_ms: u64,
+    },
+}
+
+/// Cognitive distribution metrics for telemetry.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct CognitiveDistributionMetrics {
+    /// Meta-cognitive dimension score.
+    pub meta: f32,
+    /// Operational dimension score.
+    pub operational: f32,
+    /// Epistemic dimension score.
+    pub epistemic: f32,
+    /// Instrumental dimension score.
+    pub instrumental: f32,
+    /// Balance ratio between dimensions.
+    pub balance: f32,
+    /// Uncertainty ratio.
+    pub uncertainty_ratio: f32,
 }
 
 /// Returns current UNIX timestamp in milliseconds.

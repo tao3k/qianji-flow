@@ -18,7 +18,7 @@ pub(super) fn persist_promotion_graph(
         .add_entity(topic_entity.clone())
         .map_err(|error| format!("failed to add topic entity: {error}"))?;
     graph
-        .add_relation(relation)
+        .add_relation(relation.clone())
         .map_err(|error| format!("failed to add promotion relation: {error}"))?;
     graph
         .save_to_valkey(graph_scope, graph_dimension)

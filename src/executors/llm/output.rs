@@ -159,20 +159,10 @@ impl QianjiMechanism for LlmAnalyzer {
             .and_then(|v| v.as_str())
             .unwrap_or("Proceed.");
 
-        let request = ChatRequest {
-            model: resolve_model_for_request(context, &self.model),
-            messages: vec![
-                ChatMessage {
-                    role: "system".to_string(),
-                    content: final_prompt,
-                },
-                ChatMessage {
-                    role: "user".to_string(),
-                    content: user_query.to_string(),
-                },
-            ],
-            temperature: 0.1,
-        };
+        let request = ChatRequest::new(resolve_model_for_request(context, &self.model))
+            .add_system_message(&final_prompt)
+            .add_user_message(user_query)
+            .with_temperature(0.1);
 
         let conclusion = self
             .client

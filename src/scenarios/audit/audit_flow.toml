@@ -1,0 +1,78 @@
+# Qianji Audit Flow V3.0 (Qianji Trinity Native Graph)
+# 
+# This manifest implements the "Triple Loop" natively within the Qianji Engine.
+# No hardcoded Rust loops are required. All state transitions are managed by LinkGraph.
+
+name = "Autonomous Audit & Remediation V3.0"
+version = "3.0.0"
+description = "Native Graph-driven Triple Loop (Plan -> Execute -> Verify) governed by Auditor's Codex."
+
+# -----------------------------------------------------------------------------
+# Nodes (Tasks/Agents)
+# -----------------------------------------------------------------------------
+
+[[nodes]]
+id = "plan"
+type = "llm"
+persona = "architect"
+provider = "gemini-pro"
+prompt = """
+You are the Sovereign Architect. 
+Review the codebase context and the user's intent: {{initial_context.intent}}.
+Generate a structured XML implementation plan following qianji_plan.xsd.
+Focus on: modularity, safety, and zero-leakage as per the Auditor's Codex.
+"""
+zhenfa.contract = "qianji_plan.xsd"
+
+[[nodes]]
+id = "execute"
+type = "llm"
+persona = "senior_engineer"
+provider = "claude-3-5-sonnet"
+prompt = """
+Execute the implementation steps defined in the following plan: {{nodes.plan.output}}.
+If this is a retry (attempt {{context.remediation_attempts}}), analyze the previous failures: {{nodes.verify.logs}}.
+Follow the High-Standard Rust Engineering Include Pattern for any new modules.
+"""
+tools = ["read_file", "write_file", "run_shell_command"]
+zhenfa.sandbox.profile = "strict"
+zhenfa.sandbox.ncl_contract = "packages/ncl/sandbox/main.ncl"
+
+[[nodes]]
+id = "verify"
+type = "action"
+command = "just audit-gate"
+description = "Runs TIER-3 Gate: clippy, nextest, and security scans."
+
+# -----------------------------------------------------------------------------
+# Edges: The Triple Loop (The Soul of Qianji)
+# -----------------------------------------------------------------------------
+
+[[edges]]
+from = "plan"
+to = "execute"
+description = "Strategy -> Action"
+
+[[edges]]
+from = "execute"
+to = "verify"
+description = "Action -> Audit"
+
+# The Remediation Loop (Native Edge Back-flow)
+[[edges]]
+from = "verify"
+to = "execute"
+condition = "{{nodes.verify.exit_code != 0 and context.remediation_attempts < 5}}"
+on_transition = "context.remediation_attempts += 1"
+description = "Automatic Remediation Loop (Attempt {{context.remediation_attempts}})"
+
+[[edges]]
+from = "verify"
+to = "final_commit"
+condition = "{{nodes.verify.exit_code == 0}}"
+description = "Audit Passed -> Sovereign Finality"
+
+[[nodes]]
+id = "final_commit"
+type = "action"
+command = "git commit -m 'chore: autonomous remediation via Qianji V3.0 [UNATTENDED]'"

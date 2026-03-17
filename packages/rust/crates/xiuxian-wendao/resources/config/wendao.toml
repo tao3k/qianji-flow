@@ -1,0 +1,33 @@
+# Default Wendao Configuration
+# This file provides embedded defaults for Wendao link graph indexing.
+
+[link_graph]
+# Directories to include in the knowledge graph
+include_dirs = ["docs", "packages"]
+
+# Saliency settings
+saliency_decay_factor = 0.95
+saliency_min_threshold = 0.01
+
+# Search settings
+search_max_results = 50
+search_time_budget_ms = 5000
+
+# PPR (Personalized PageRank) settings
+ppr_alpha = 0.85
+ppr_max_iterations = 100
+ppr_convergence_threshold = 1e-6
+
+# Hybrid retrieval mode: "vector_only", "graph_only", or "hybrid"
+retrieval_mode = "hybrid"
+
+# Coactivation cache settings
+[link_graph.coactivation]
+max_neighbors_per_direction = 32
+touch_queue_depth = 256
+
+# Related search settings
+[link_graph.related]
+max_candidates = 100
+max_partitions = 10
+time_budget_ms = 1000

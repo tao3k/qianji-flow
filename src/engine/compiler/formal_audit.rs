@@ -92,3 +92,26 @@ pub(super) fn score_key(node_def: &NodeDefinition) -> String {
         .unwrap_or("audit_score")
         .to_string()
 }
+
+/// Returns whether cognitive supervision is enabled for formal audit.
+/// Defaults to `false` for backward compatibility.
+#[cfg(feature = "llm")]
+pub(super) fn enable_cognitive_supervision(node_def: &NodeDefinition) -> bool {
+    node_def
+        .params
+        .get("enable_cognitive_supervision")
+        .and_then(serde_json::Value::as_bool)
+        .unwrap_or(false)
+}
+
+/// Returns the cognitive early halt threshold for formal audit.
+/// Defaults to `0.3` (halt if coherence drops below 30%).
+#[cfg(feature = "llm")]
+pub(super) fn cognitive_early_halt_threshold(node_def: &NodeDefinition) -> f32 {
+    node_def
+        .params
+        .get("cognitive_early_halt_threshold")
+        .and_then(serde_json::Value::as_f64)
+        .map(|v| v as f32)
+        .unwrap_or(0.3)
+}

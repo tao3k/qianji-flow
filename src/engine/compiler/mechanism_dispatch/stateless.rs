@@ -1,8 +1,8 @@
 use crate::executors::knowledge::KnowledgeSeeker;
 use std::sync::Arc;
 
-use super::super::{stateful_mechanisms, task_type};
 use super::resolver_chain;
+use crate::engine::compiler::{stateful_mechanisms, task_type};
 
 pub(super) fn build(
     context: resolver_chain::DispatchContext<'_>,

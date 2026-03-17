@@ -3,10 +3,10 @@ use crate::error::QianjiError;
 use std::sync::Arc;
 
 #[cfg(feature = "llm")]
-use super::super::super::llm_client;
+use crate::engine::compiler::llm_client;
+use crate::engine::compiler::mechanism_dispatch::resolver_chain;
 #[cfg(feature = "llm")]
-use super::super::super::stateful_mechanisms;
-use super::super::resolver_chain;
+use crate::engine::compiler::stateful_mechanisms;
 
 #[cfg(feature = "llm")]
 pub(super) fn build(

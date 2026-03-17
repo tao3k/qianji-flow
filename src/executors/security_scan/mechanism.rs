@@ -2,10 +2,10 @@
 
 use crate::contracts::{FlowInstruction, QianjiMechanism, QianjiOutput};
 use async_trait::async_trait;
-use omni_ast::SecurityScanner;
 use serde_json::json;
 use std::fs;
 use std::path::Path;
+use xiuxian_ast::SecurityScanner;
 
 /// Mechanism responsible for statically analyzing code files for security violations.
 pub struct SecurityScanMechanism {

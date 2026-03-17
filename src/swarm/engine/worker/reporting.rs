@@ -1,7 +1,6 @@
-use super::super::SwarmAgentReport;
-use super::super::orchestrator::SwarmEngine;
-use super::super::types::WorkerJoinSet;
 use crate::error::QianjiError;
+use crate::swarm::engine::types::WorkerJoinSet;
+use crate::swarm::engine::{SwarmAgentReport, SwarmEngine};
 use tokio_util::sync::CancellationToken;
 
 impl SwarmEngine {

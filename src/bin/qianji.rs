@@ -187,6 +187,14 @@ impl xiuxian_llm::llm::LlmClient for NoopLlmClient {
     ) -> xiuxian_llm::llm::LlmResult<String> {
         Ok("noop".into())
     }
+
+    async fn chat_stream(
+        &self,
+        _request: xiuxian_llm::llm::ChatRequest,
+    ) -> xiuxian_llm::llm::LlmResult<xiuxian_llm::llm::client::ChatStream> {
+        use futures::stream;
+        Ok(Box::pin(stream::iter(vec![Ok("noop".to_string())])))
+    }
 }
 
 fn inject_llm_model_fallback_if_missing(context: &mut serde_json::Value, default_model: &str) {

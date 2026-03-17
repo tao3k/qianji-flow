@@ -1,7 +1,7 @@
-use super::super::QianjiScheduler;
-use super::super::types::REMOTE_POSSESSION_REQUEST_TTL_SECONDS;
 use crate::contracts::QianjiOutput;
 use crate::error::QianjiError;
+use crate::scheduler::core::QianjiScheduler;
+use crate::scheduler::core::types::REMOTE_POSSESSION_REQUEST_TTL_SECONDS;
 use crate::scheduler::preflight::resolve_wendao_placeholders_in_context;
 use crate::swarm::{RemoteNodeResponse, map_execution_error_to_response};
 use tokio::time::Duration;

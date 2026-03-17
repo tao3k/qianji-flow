@@ -27,6 +27,8 @@ pub mod runtime_config;
 pub mod safety;
 /// Asynchronous synaptic-flow scheduler.
 pub mod scheduler;
+/// Sovereign Memory Module (Blueprint V6.1) - Agent reasoning trace persistence.
+pub mod sovereign;
 /// Multi-agent swarm orchestration runtime.
 pub mod swarm;
 /// Real-time swarm telemetry contracts and Valkey emitter.

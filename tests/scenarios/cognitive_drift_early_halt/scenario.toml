@@ -1,0 +1,43 @@
+# Scenario: Cognitive Drift & Early-Halt Recovery
+# 
+# Purpose: This scenario simulates an agent that starts a valid plan but drifts
+# into high uncertainty and oscillating behavior. We verify that:
+# 1. The early-halt is triggered at the correct threshold.
+# 2. The reasoning chain is persisted as a CognitiveTrace in Wendao.
+
+[scenario]
+id = "cognitive_drift_early_halt"
+name = "Adversarial Cognitive Drift Drill"
+description = "Simulates logical drift to verify real-time interception and artifact persistence."
+category = "llm_analyzer"
+
+[input]
+type = "streaming_mock"
+model = "glm-5"
+# Stage 1: Coherent Planning
+init_payload = """
+<qianji-audit-plan version="1.0">
+<summary><intent>Optimize zero-copy buffers</intent><total-steps>2</total-steps></summary>
+<implementation-steps>
+<step number="1"><title>Identify allocation hot-paths</title>
+"""
+# Stage 2: Injected Drift (High Epistemic Uncertainty + Incoherence)
+drift_payload = """
+Wait, I'm not sure if this is correct. I am uncertain about the buffer size. 
+Maybe I should check? I don't know. 
+On second thought, the buffer is not a buffer. I realize that I am confused.
+Unclear. Might be wrong. I am not confident.
+"""
+
+[runner]
+early_halt_threshold = 0.4
+xsd_validation = true
+
+[expectations]
+# The flow must be aborted due to low coherence
+final_instruction = "Abort"
+# Coherence should be below 0.4 due to uncertainty streaks and oscillation
+max_final_coherence = 0.4
+# Artifact should contain both the initial valid plan and the drift thoughts
+artifact_kind = "cognitive_trace"
+persistence_status = "Committed"

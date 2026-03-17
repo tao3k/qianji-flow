@@ -1,6 +1,6 @@
-use super::super::QianjiScheduler;
-use super::super::types::RemoteDelegationOutcome;
 use crate::error::QianjiError;
+use crate::scheduler::core::QianjiScheduler;
+use crate::scheduler::core::types::RemoteDelegationOutcome;
 use petgraph::stable_graph::NodeIndex;
 use std::collections::HashSet;
 

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Qianji (千机) Audit Plan Schema v1.0
+  Part of the xiuxian-zhenfa (阵法) Contract System.
+  
+  This schema enforces high-standard engineering plans for autonomous agents.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Simple Types -->
+  <xs:simpleType name="ActionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="create"/>
+      <xs:enumeration value="modify"/>
+      <xs:enumeration value="delete"/>
+      <xs:enumeration value="research"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SeverityType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="low"/>
+      <xs:enumeration value="medium"/>
+      <xs:enumeration value="high"/>
+      <xs:enumeration value="critical"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Rich Content for Steps -->
+  <xs:complexType name="StepContentType" mixed="true">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string"/>
+      <xs:element name="code-snippet" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Individual Step -->
+  <xs:complexType name="ImplementationStepType">
+    <xs:sequence>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="file-target" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="path" type="xs:string" use="required"/>
+          <xs:attribute name="action" type="ActionType" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="rationale" type="xs:string"/>
+      <xs:element name="content" type="StepContentType"/>
+    </xs:sequence>
+    <xs:attribute name="number" type="xs:positiveInteger" use="required"/>
+  </xs:complexType>
+
+  <!-- Risk and Mitigation Pair -->
+  <xs:complexType name="RiskMitigationType">
+    <xs:sequence>
+      <xs:element name="potential-issue" type="xs:string"/>
+      <xs:element name="mitigation-strategy" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="severity" type="SeverityType" use="required"/>
+  </xs:complexType>
+
+  <!-- Root Element: The Audit Plan -->
+  <xs:element name="qianji-audit-plan">
+    <xs:complexType>
+      <xs:sequence>
+        <!-- Task Summary -->
+        <xs:element name="summary">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="intent" type="xs:string"/>
+              <xs:element name="total-steps" type="xs:positiveInteger"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- Mandatory Implementation Steps (Minimum 1) -->
+        <xs:element name="implementation-steps">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="step" type="ImplementationStepType" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- Mandatory Risk Assessment (Minimum 1) -->
+        <xs:element name="risk-assessment">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="risk-pair" type="RiskMitigationType" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- Verification Strategy -->
+        <xs:element name="verification-strategy">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="test-command" type="xs:string"/>
+              <xs:element name="expected-outcome" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" fixed="1.0"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

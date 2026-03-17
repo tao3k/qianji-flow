@@ -1,4 +1,4 @@
-use super::super::QianjiScheduler;
+use crate::scheduler::core::QianjiScheduler;
 use crate::telemetry::{ConsensusStatus, SwarmEvent, unix_millis_now};
 
 impl QianjiScheduler {

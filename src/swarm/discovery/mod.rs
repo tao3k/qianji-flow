@@ -1,9 +1,9 @@
 //! Global swarm discovery via Valkey heartbeat registry.
 
-mod model;
+pub(crate) mod model;
 mod parse;
 mod registry;
-mod util;
+pub(crate) mod util;
 
 pub use model::{ClusterNodeIdentity, ClusterNodeRecord};
 pub use registry::GlobalSwarmRegistry;

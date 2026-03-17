@@ -1,6 +1,6 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
-pub(super) const REGISTRY_INDEX_KEY: &str = "xiuxian:swarm:registry:index";
+pub(crate) const REGISTRY_INDEX_KEY: &str = "xiuxian:swarm:registry:index";
 
 pub(super) fn normalize_optional_text(value: Option<String>) -> Option<String> {
     value

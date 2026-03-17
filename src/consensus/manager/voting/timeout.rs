@@ -1,5 +1,5 @@
-use super::super::ConsensusManager;
-use super::super::time::current_unix_millis;
+use crate::consensus::ConsensusManager;
+use crate::consensus::manager::time::current_unix_millis;
 use crate::consensus::models::ConsensusPolicy;
 use anyhow::Result;
 

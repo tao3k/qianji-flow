@@ -1,0 +1,14 @@
+---
+source: packages/rust/crates/xiuxian-testing/src/scenario.rs
+assertion_line: 332
+expression: result
+---
+{
+  "scenario_id": "cognitive_drift_early_halt",
+  "scenario_name": "Adversarial Cognitive Drift Drill",
+  "category": "llm_analyzer",
+  "status": "configured",
+  "streaming_enabled": true,
+  "cognitive_supervision": true,
+  "early_halt_threshold": 0.3
+}

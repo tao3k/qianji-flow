@@ -1,7 +1,7 @@
-use super::super::constants::{DEFAULT_API_KEY_ENV, DEFAULT_BASE_URL, DEFAULT_MODEL};
-use super::super::env_vars::env_var_or_override;
-use super::super::model::{QianjiRuntimeEnv, QianjiRuntimeLlmConfig};
-use super::super::toml_config::QianjiTomlLlm;
+use crate::runtime_config::constants::{DEFAULT_API_KEY_ENV, DEFAULT_BASE_URL, DEFAULT_MODEL};
+use crate::runtime_config::env_vars::env_var_or_override;
+use crate::runtime_config::model::{QianjiRuntimeEnv, QianjiRuntimeLlmConfig};
+use crate::runtime_config::toml_config::QianjiTomlLlm;
 use std::io;
 
 #[cfg(feature = "llm")]

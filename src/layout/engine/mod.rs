@@ -1,6 +1,5 @@
 //! Engine-facing layout API for BPMN and deep graph exports.
 
-mod deep_graph;
 mod layout_core;
 mod types;
 

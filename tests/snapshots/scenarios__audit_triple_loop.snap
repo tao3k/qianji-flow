@@ -1,0 +1,24 @@
+---
+source: packages/rust/crates/xiuxian-testing/src/scenario.rs
+expression: result
+---
+{
+  "scenario_id": "audit_triple_loop",
+  "scenario_name": "Audit Triple Loop",
+  "category": "audit_flow",
+  "triple_loop": {
+    "plan_phase": "configured",
+    "execute_phase": "configured",
+    "verify_phase": "configured"
+  },
+  "cognitive_supervision": {
+    "enabled": true,
+    "early_halt_threshold": 0.3,
+    "coherence_monitoring": true
+  },
+  "remediation": {
+    "max_attempts": 5,
+    "auto_retry": true
+  },
+  "xsd_contract": "qianji_plan.xsd"
+}

@@ -42,7 +42,9 @@ reqwest = { workspace = true, optional = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }
+insta = { workspace = true }
 xiuxian-zhixing = { path = "../xiuxian-zhixing" }
+xiuxian-testing = { path = "../xiuxian-testing" }
 
 [lints]
 workspace = true
@@ -55,3 +57,24 @@ path = "src/lib.rs"
 name = "qianji"
 path = "src/bin/qianji.rs"
 required-features = ["llm"]
+
+# Integration tests requiring llm feature
+[[test]]
+name = "llm_augmented_formal_audit"
+path = "tests/integration/llm_augmented_formal_audit.rs"
+required-features = ["llm"]
+
+[[test]]
+name = "llm_analyzer"
+path = "tests/integration/llm_analyzer.rs"
+required-features = ["llm"]
+
+[[test]]
+name = "llm_multi_tenancy"
+path = "tests/integration/llm_multi_tenancy.rs"
+required-features = ["llm"]
+
+# Unit tests for telemetry
+[[test]]
+name = "unit_telemetry_events"
+path = "tests/unit/unit_telemetry_events.rs"

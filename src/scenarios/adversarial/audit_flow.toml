@@ -1,0 +1,81 @@
+# Qianji Multi-Model Adversarial Audit Flow V1.0
+# 
+# Patterns: Proposer (GLM-5) vs. Critic (Claude 3.5 Sonnet)
+# Governance: ZhenfaPipeline (Sovereign Arbitration)
+
+name = "Multi-Model Red-Team Audit"
+version = "1.0.0"
+description = "Adversarial audit loop where Claude attacks GLM-5's implementations based on the Auditor's Codex."
+
+# -----------------------------------------------------------------------------
+# Nodes (The Combatants)
+# -----------------------------------------------------------------------------
+
+[[nodes]]
+id = "crafter"
+type = "llm"
+persona = "architect"
+provider = "glm-5"
+prompt = """
+You are the Crafter. Implement the requested feature: {{initial_context.intent}}.
+Output a structured implementation plan following qianji_plan.xsd.
+Focus on extreme modularity and zero-copy performance.
+"""
+zhenfa.contract = "scenarios/audit/qianji_plan.xsd"
+zhenfa.supervisor.threshold = 0.5
+
+[[nodes]]
+id = "inquisitor"
+type = "llm"
+persona = "red_team_auditor"
+provider = "claude-3-5-sonnet"
+prompt = """
+You are the Inquisitor (Red Team). 
+Audit the implementation plan produced by the Crafter: {{nodes.crafter.output}}.
+Search for:
+1. Logic gaps and edge-case failures.
+2. Security vulnerabilities (injection, leakage).
+3. Violations of the Auditor's Codex (modularity, performance).
+Output your findings in audit_findings.xsd format.
+Be ruthless. If you find issues, provide specific remediation steps.
+"""
+zhenfa.contract = "scenarios/adversarial/audit_findings.xsd"
+zhenfa.supervisor.threshold = 0.7
+
+[[nodes]]
+id = "verify"
+type = "action"
+command = "just audit-gate"
+description = "Physical verification via Clippy and Nextest."
+
+# -----------------------------------------------------------------------------
+# Edges (The Conflict Logic)
+# -----------------------------------------------------------------------------
+
+[[edges]]
+from = "crafter"
+to = "inquisitor"
+description = "Implementation -> Red Team Audit"
+
+[[edges]]
+from = "inquisitor"
+to = "crafter"
+condition = "{{nodes.inquisitor.output.severity == 'high' or nodes.inquisitor.output.severity == 'critical'}}"
+on_transition = "context.remediation_attempts += 1"
+description = "Red Team Found Critical Flaws -> Mandatory Remediation"
+
+[[edges]]
+from = "inquisitor"
+to = "verify"
+condition = "{{nodes.inquisitor.output.severity == 'low' or nodes.inquisitor.output.severity == 'none'}}"
+description = "Red Team Approval -> Physical Verification"
+
+[[edges]]
+from = "verify"
+to = "final_commit"
+condition = "{{nodes.verify.exit_code == 0}}"
+
+[[nodes]]
+id = "final_commit"
+type = "action"
+command = "git commit -m 'chore: adversarial-verified remediation via Qianji'"

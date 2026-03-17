@@ -2,7 +2,7 @@ use crate::contracts::{NodeDefinition, QianjiMechanism};
 use crate::error::QianjiError;
 use std::sync::Arc;
 
-use super::super::{router, wendao_ingester, wendao_refresh};
+use crate::engine::compiler::{router, wendao_ingester, wendao_refresh};
 
 pub(in crate::engine::compiler) fn wendao_ingester(
     node_def: &NodeDefinition,

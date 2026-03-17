@@ -1,5 +1,5 @@
-use super::super::task_type;
 use super::resolver_chain;
+use crate::engine::compiler::task_type;
 
 mod formal_audit;
 mod llm;

@@ -1,4 +1,4 @@
-use super::super::super::orchestrator::SwarmEngine;
+use crate::swarm::engine::SwarmEngine;
 use crate::telemetry::SwarmEvent;
 use std::sync::Arc;
 

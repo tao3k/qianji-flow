@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Qianji Red-Team Audit Findings Schema v1.0
+  Contract for the Inquisitor node in adversarial loops.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="SeverityType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="none"/>
+      <xs:enumeration value="low"/>
+      <xs:enumeration value="medium"/>
+      <xs:enumeration value="high"/>
+      <xs:enumeration value="critical"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="FindingType">
+    <xs:sequence>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="vulnerability-type" type="xs:string"/>
+      <xs:element name="location" type="xs:string"/>
+      <xs:element name="evidence" type="xs:string"/>
+      <xs:element name="remediation-step" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="audit-report">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="summary">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="overall-score" type="xs:float"/>
+              <xs:element name="findings-count" type="xs:nonNegativeInteger"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        
+        <xs:element name="findings">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="finding" type="FindingType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="severity" type="SeverityType" use="required"/>
+      <xs:attribute name="version" type="xs:string" fixed="1.0"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

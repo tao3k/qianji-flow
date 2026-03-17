@@ -1,6 +1,6 @@
 //! Swarm orchestration for multi-agent concurrent execution.
 
-mod discovery;
+pub(crate) mod discovery;
 mod engine;
 mod possession;
 

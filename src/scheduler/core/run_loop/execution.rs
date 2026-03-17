@@ -1,5 +1,5 @@
-use super::super::QianjiScheduler;
 use crate::error::QianjiError;
+use crate::scheduler::core::QianjiScheduler;
 use crate::scheduler::state::NodeExecutionResult;
 use futures::{StreamExt, stream::FuturesUnordered};
 use petgraph::stable_graph::NodeIndex;
@@ -51,12 +51,7 @@ impl QianjiScheduler {
             }
 
             let deferred_nodes = self
-                .launch_ready_nodes(
-                    &mut exec_state,
-                    &context,
-                    session_id.as_deref(),
-                    &mut executing_tasks,
-                )
+                .launch_ready_nodes(&mut exec_state, &context, &mut executing_tasks)
                 .await;
 
             if executing_tasks.is_empty() && deferred_nodes.is_empty() {

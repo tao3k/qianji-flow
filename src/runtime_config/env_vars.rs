@@ -1,5 +1,4 @@
 use super::model::QianjiRuntimeEnv;
-use xiuxian_macros::env_first_non_empty;
 
 pub(super) fn env_var_or_override(runtime_env: &QianjiRuntimeEnv, key: &str) -> Option<String> {
     match env_override_state(runtime_env, key) {
@@ -7,7 +6,7 @@ pub(super) fn env_var_or_override(runtime_env: &QianjiRuntimeEnv, key: &str) -> 
         EnvOverrideState::Empty => return Some(String::new()),
         EnvOverrideState::Missing => {}
     }
-    env_first_non_empty!(key)
+    read_env_non_empty(key)
 }
 
 pub(super) fn resolve_api_key_from_env(
@@ -29,7 +28,7 @@ pub(super) fn resolve_api_key_from_env(
         return None;
     }
 
-    env_first_non_empty!("OPENAI_API_KEY", api_key_env)
+    read_first_non_empty_env(["OPENAI_API_KEY", api_key_env])
 }
 
 pub(super) fn parse_usize_env_override(runtime_env: &QianjiRuntimeEnv, key: &str) -> Option<usize> {
@@ -75,4 +74,15 @@ fn parse_bool_flag(raw: &str) -> Option<bool> {
         "0" | "false" | "no" | "off" => Some(false),
         _ => None,
     }
+}
+
+fn read_env_non_empty(key: &str) -> Option<String> {
+    std::env::var(key)
+        .ok()
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty())
+}
+
+fn read_first_non_empty_env<const N: usize>(keys: [&str; N]) -> Option<String> {
+    keys.into_iter().find_map(read_env_non_empty)
 }

@@ -63,6 +63,8 @@ pub(super) fn formal_audit_with_llm(
             retry_counter_key: formal_audit::retry_counter_key(node_def),
             output_key: formal_audit::output_key(node_def),
             score_key: formal_audit::score_key(node_def),
+            cognitive_early_halt_threshold: formal_audit::cognitive_early_halt_threshold(node_def),
+            enable_cognitive_supervision: formal_audit::enable_cognitive_supervision(node_def),
         },
     ))
 }
@@ -96,21 +98,13 @@ pub(super) fn llm(
     let llm_cfg = llm_node::mechanism_config(node_def);
     let ann_cfg = annotation::mechanism_config(node_def);
 
-    Arc::new(crate::executors::llm::LlmAnalyzer {
-        client,
-        annotator: ContextAnnotator {
-            orchestrator: Arc::clone(orchestrator),
-            registry: Arc::clone(registry),
-            persona_id: ann_cfg.persona_id,
-            template_target: ann_cfg.template_target,
-            execution_mode: ann_cfg.execution_mode,
-            input_keys: ann_cfg.input_keys,
-            history_key: ann_cfg.history_key,
-            output_key: ann_cfg.output_key,
-        },
-        model: llm_cfg.model,
-        output_key: llm_cfg.output_key,
-        parse_json_output: llm_cfg.parse_json_output,
-        fallback_repo_tree_on_parse_failure: llm_cfg.fallback_repo_tree_on_parse_failure,
-    })
+    Arc::new(
+        crate::executors::llm::StreamingLlmAnalyzer::builder()
+            .client(client)
+            .model(llm_cfg.model)
+            .output_key(llm_cfg.output_key)
+            .parse_json_output(llm_cfg.parse_json_output)
+            .fallback_repo_tree(llm_cfg.fallback_repo_tree_on_parse_failure)
+            .build(),
+    )
 }

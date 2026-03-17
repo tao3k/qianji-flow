@@ -2,7 +2,7 @@ use crate::contracts::{NodeDefinition, QianjiMechanism};
 use crate::executors::calibration::SynapseCalibrator;
 use std::sync::Arc;
 
-use super::super::{calibration, security_scan};
+use crate::engine::compiler::{calibration, security_scan};
 
 pub(in crate::engine::compiler) fn calibration(
     node_def: &NodeDefinition,
@@ -17,12 +17,6 @@ pub(in crate::engine::compiler) fn mock(node_def: &NodeDefinition) -> Arc<dyn Qi
     Arc::new(crate::executors::MockMechanism {
         name: node_def.id.clone(),
         weight: node_def.weight,
-        output_key: node_def
-            .params
-            .get("output_key")
-            .and_then(|v| v.as_str())
-            .map(ToString::to_string),
-        mock_output: node_def.params.get("mock_output").cloned(),
     })
 }
 

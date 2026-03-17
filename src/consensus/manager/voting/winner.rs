@@ -1,5 +1,5 @@
-use super::super::ConsensusManager;
-use super::super::keys::VoteKeys;
+use crate::consensus::ConsensusManager;
+use crate::consensus::manager::keys::VoteKeys;
 use anyhow::Result;
 
 impl ConsensusManager {

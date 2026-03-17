@@ -1,7 +1,7 @@
 use crate::contracts::{NodeDefinition, QianjiMechanism};
 use std::sync::Arc;
 
-use super::super::io_mechanisms;
+use crate::engine::compiler::io_mechanisms;
 
 pub(in crate::engine::compiler) fn command(node_def: &NodeDefinition) -> Arc<dyn QianjiMechanism> {
     let config = io_mechanisms::command_mechanism_config(node_def);

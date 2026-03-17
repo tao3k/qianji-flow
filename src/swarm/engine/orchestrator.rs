@@ -3,6 +3,7 @@ use super::{SwarmAgentConfig, SwarmExecutionOptions, SwarmExecutionReport};
 use crate::QianjiEngine;
 use crate::error::QianjiError;
 use std::sync::Arc;
+use tokio_util::sync::CancellationToken;
 
 /// Orchestrates one flow with multiple isolated worker schedulers.
 pub struct SwarmEngine {
@@ -42,8 +43,11 @@ impl SwarmEngine {
             cluster_id: options.cluster_id,
             remote_enabled: options.enable_remote_possession,
             poll_interval_ms: options.possession_poll_interval_ms.max(100),
+            allow_local_affinity_proxy: options.allow_local_affinity_proxy,
+            pulse_emitter: options.pulse_emitter,
         };
 
+        let cancel_token = CancellationToken::new();
         let mut join_set = WorkerJoinSet::new();
         for identity in identities {
             self.spawn_worker_task(
@@ -51,10 +55,11 @@ impl SwarmEngine {
                 identity,
                 initial_context.clone(),
                 runtime.clone(),
+                cancel_token.clone(),
             );
         }
 
-        let workers = Self::collect_worker_reports(&mut join_set).await;
+        let workers = Self::collect_worker_reports(&mut join_set, &cancel_token).await?;
         let final_context = Self::select_final_context(&workers)?;
         Ok(SwarmExecutionReport {
             session_id: runtime.session_id,

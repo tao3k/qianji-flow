@@ -2,10 +2,10 @@ use crate::contracts::QianjiMechanism;
 use crate::error::QianjiError;
 use std::sync::Arc;
 
-use super::super::super::stateful_mechanisms;
+use crate::engine::compiler::mechanism_dispatch::resolver_chain;
+use crate::engine::compiler::stateful_mechanisms;
 #[cfg(feature = "llm")]
-use super::super::super::{formal_audit as formal_audit_cfg, llm_client};
-use super::super::resolver_chain;
+use crate::engine::compiler::{formal_audit as formal_audit_cfg, llm_client};
 
 #[cfg(feature = "llm")]
 pub(super) fn build(

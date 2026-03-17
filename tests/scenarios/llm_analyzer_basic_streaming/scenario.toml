@@ -1,0 +1,13 @@
+# Scenario: LLM Analyzer Basic Streaming
+# Test basic LLM analyzer configuration structure
+
+[scenario]
+id = "llm_analyzer_basic_streaming"
+name = "LLM Analyzer Basic Streaming"
+description = "Test basic LLM analyzer configuration structure with cognitive supervision"
+category = "llm_analyzer"
+
+[input]
+type = "config"
+
+[runner]

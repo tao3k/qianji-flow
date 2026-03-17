@@ -1,5 +1,5 @@
-use super::super::QianjiScheduler;
 use crate::engine::NodeExecutionAffinity;
+use crate::scheduler::core::QianjiScheduler;
 use petgraph::stable_graph::NodeIndex;
 
 pub(in crate::scheduler::core) enum AuthVerdict {

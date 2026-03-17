@@ -1,7 +1,7 @@
-use super::super::QianjiScheduler;
-use super::super::types::{ConsensusCheckpointView, ConsensusOutcome};
 use crate::contracts::NodeStatus;
 use crate::error::QianjiError;
+use crate::scheduler::core::QianjiScheduler;
+use crate::scheduler::core::types::{ConsensusCheckpointView, ConsensusOutcome};
 use crate::scheduler::state::{NodeExecutionResult, merge_output_data};
 use petgraph::stable_graph::NodeIndex;
 use std::collections::HashSet;

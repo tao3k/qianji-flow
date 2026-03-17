@@ -1,10 +1,11 @@
 use crate::contracts::{FlowInstruction, QianjiMechanism, QianjiOutput};
 use crate::executors::annotation::ContextAnnotator;
 use async_trait::async_trait;
+use futures::StreamExt;
 use serde_json::{Value, json};
 use std::sync::Arc;
-use xiuxian_llm::llm::{ChatMessage, ChatRequest, LlmClient};
-use xiuxian_zhenfa::ZhenfaTransmuter;
+use xiuxian_llm::llm::{ChatRequest, LlmClient};
+use xiuxian_zhenfa::{StreamProvider, ZhenfaPipeline, ZhenfaTransmuter};
 
 fn context_non_empty_string(context: &Value, key: &str) -> Option<String> {
     context
@@ -38,6 +39,11 @@ fn score_to_memrl_reward(score: f32) -> f32 {
 }
 
 /// LLM-driven formal audit controller (Synaptic Flow V2).
+///
+/// This mechanism implements cognitive supervision during audit:
+/// - Real-time coherence monitoring during LLM streaming
+/// - Early-halt detection for cognitive drift
+/// - Cognitive distribution metrics in output
 pub struct LlmAugmentedAuditMechanism {
     /// Node-local context annotator used to generate critique prompts.
     pub annotator: ContextAnnotator,
@@ -57,6 +63,94 @@ pub struct LlmAugmentedAuditMechanism {
     pub output_key: String,
     /// Output key used for numeric score extraction.
     pub score_key: String,
+    /// Early-halt threshold for cognitive coherence (0.0 to disable).
+    pub cognitive_early_halt_threshold: f32,
+    /// Whether to enable cognitive monitoring.
+    pub enable_cognitive_supervision: bool,
+}
+
+impl LlmAugmentedAuditMechanism {
+    /// Resolve the streaming provider based on model name.
+    fn resolve_provider(&self) -> StreamProvider {
+        let model_lower = self.model.to_lowercase();
+        if model_lower.contains("claude") || model_lower.contains("anthropic") {
+            StreamProvider::Claude
+        } else if model_lower.contains("gemini") {
+            StreamProvider::Gemini
+        } else {
+            StreamProvider::Codex
+        }
+    }
+
+    /// Execute LLM request with cognitive supervision.
+    ///
+    /// Returns the critique text and cognitive metrics.
+    async fn execute_with_cognitive_supervision(
+        &self,
+        request: ChatRequest,
+    ) -> Result<(String, Option<CognitiveMetrics>), String> {
+        use xiuxian_zhenfa::CognitiveDistribution;
+
+        // Initialize the Cognitive Pipeline
+        let mut pipeline = ZhenfaPipeline::with_options(
+            self.resolve_provider(),
+            true,  // validate_xsd
+            true,  // monitor_cognitive
+            self.cognitive_early_halt_threshold,
+        );
+
+        // Start streaming
+        let mut stream = self
+            .client
+            .chat_stream(request)
+            .await
+            .map_err(|e| format!("Stream initiation failed: {e}"))?;
+
+        let mut accumulated_text = String::new();
+        let mut early_halt_reason: Option<String> = None;
+
+        // In-flight cognitive supervision loop
+        while let Some(chunk_result) = stream.next().await {
+            let chunk = chunk_result.map_err(|e| format!("Stream chunk error: {e}"))?;
+            accumulated_text.push_str(&chunk);
+
+            // Process through ZhenfaPipeline for cognitive analysis
+            let synthetic_line = format!(
+                r#"{{"type":"content_block_delta","index":0,"delta":{{"type":"text_delta","text":"{}"}}}}"#,
+                chunk.replace('\\', "\\\\").replace('"', "\\\"")
+            );
+
+            if let Err(e) = pipeline.process_line(&synthetic_line) {
+                early_halt_reason = Some(format!("Cognitive Guard Violation: {e}"));
+                break;
+            }
+
+            if pipeline.should_halt() {
+                early_halt_reason = Some(format!(
+                    "Cognitive Drift Detected (Score: {:.2})",
+                    pipeline.coherence_score()
+                ));
+                break;
+            }
+        }
+
+        let _ = pipeline.finalize();
+
+        let metrics = CognitiveMetrics {
+            coherence: pipeline.coherence_score(),
+            early_halt: early_halt_reason.is_some() || pipeline.should_halt(),
+            distribution: pipeline.cognitive_distribution(),
+        };
+
+        Ok((accumulated_text, Some(metrics)))
+    }
+}
+
+/// Cognitive metrics from supervision.
+struct CognitiveMetrics {
+    coherence: f32,
+    early_halt: bool,
+    distribution: xiuxian_zhenfa::CognitiveDistribution,
 }
 
 #[async_trait]
@@ -85,26 +179,23 @@ impl QianjiMechanism for LlmAugmentedAuditMechanism {
             .filter(|value| !value.trim().is_empty())
             .unwrap_or("Critique the agenda and emit an XML <score> tag.");
 
-        let request = ChatRequest {
-            model: resolve_model_for_request(context, &self.model),
-            messages: vec![
-                ChatMessage {
-                    role: "system".to_string(),
-                    content: prompt.to_string().into(),
-                },
-                ChatMessage {
-                    role: "user".to_string(),
-                    content: user_query.to_string().into(),
-                },
-            ],
-            temperature: 0.1,
-        };
+        let request = ChatRequest::new(resolve_model_for_request(context, &self.model))
+            .add_system_message(prompt)
+            .add_user_message(user_query)
+            .with_temperature(0.1);
 
-        let critique = self
-            .client
-            .chat(request)
-            .await
-            .map_err(|error| format!("LLM formal audit execution failed: {error}"))?;
+        // Execute with cognitive supervision if enabled
+        let (critique, cognitive_metrics) = if self.enable_cognitive_supervision {
+            self.execute_with_cognitive_supervision(request).await?
+        } else {
+            (
+                self.client
+                    .chat(request)
+                    .await
+                    .map_err(|error| format!("LLM formal audit execution failed: {error}"))?,
+                None,
+            )
+        };
         let parsed_score = extract_xml_score(&critique);
         let score = parsed_score.unwrap_or(0.0);
         let failed = score < self.threshold_score;
@@ -125,6 +216,35 @@ impl QianjiMechanism for LlmAugmentedAuditMechanism {
             json!(score_to_memrl_reward(score)),
         );
         data.insert("memrl_signal_source".to_string(), json!("formal_audit.llm"));
+
+        // Add cognitive metrics if available
+        if let Some(metrics) = cognitive_metrics {
+            data.insert("_cognitive_coherence".to_string(), json!(metrics.coherence));
+            data.insert("_early_halt_triggered".to_string(), json!(metrics.early_halt));
+            data.insert(
+                "_cognitive_distribution".to_string(),
+                json!({
+                    "meta": metrics.distribution.meta,
+                    "operational": metrics.distribution.operational,
+                    "epistemic": metrics.distribution.epistemic,
+                    "instrumental": metrics.distribution.instrumental,
+                    "balance": metrics.distribution.balance(),
+                    "uncertainty_ratio": metrics.distribution.uncertainty_ratio(),
+                }),
+            );
+
+            // Abort if cognitive early halt was triggered
+            if metrics.early_halt {
+                data.insert("audit_status".to_string(), json!("cognitive_drift"));
+                return Ok(QianjiOutput {
+                    data: Value::Object(data),
+                    instruction: FlowInstruction::Abort(format!(
+                        "Cognitive drift detected (coherence: {:.2})",
+                        metrics.coherence
+                    )),
+                });
+            }
+        }
         if let Some(memrl_episode_id) = context_non_empty_string(context, "memrl_episode_id")
             .or_else(|| context_non_empty_string(context, "episode_id"))
         {

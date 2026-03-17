@@ -1,6 +1,6 @@
-use super::super::QianjiScheduler;
 use crate::contracts::FlowInstruction;
 use crate::error::QianjiError;
+use crate::scheduler::core::QianjiScheduler;
 use std::collections::HashSet;
 
 impl QianjiScheduler {

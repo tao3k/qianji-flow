@@ -71,4 +71,11 @@ impl LlmClient for MockBootcampLlmClient {
     async fn chat(&self, _request: ChatRequest) -> LlmResult<String> {
         Ok(self.response.clone())
     }
+
+    async fn chat_stream(&self, _request: ChatRequest) -> LlmResult<xiuxian_llm::llm::client::ChatStream> {
+        use futures::stream;
+
+        let chunks: Vec<LlmResult<String>> = vec![Ok(self.response.clone())];
+        Ok(Box::pin(stream::iter(chunks)))
+    }
 }

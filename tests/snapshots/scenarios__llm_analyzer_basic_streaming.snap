@@ -1,0 +1,13 @@
+---
+source: packages/rust/crates/xiuxian-testing/src/scenario.rs
+expression: result
+---
+{
+  "scenario_id": "llm_analyzer_basic_streaming",
+  "scenario_name": "LLM Analyzer Basic Streaming",
+  "category": "llm_analyzer",
+  "status": "configured",
+  "streaming_enabled": true,
+  "cognitive_supervision": true,
+  "early_halt_threshold": 0.3
+}

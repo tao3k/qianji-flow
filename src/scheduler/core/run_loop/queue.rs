@@ -1,4 +1,4 @@
-use super::super::QianjiScheduler;
+use crate::scheduler::core::QianjiScheduler;
 use crate::scheduler::state::{ExecutionState, NodeExecutionResult, spawn_node_execution_task};
 use futures::stream::FuturesUnordered;
 use petgraph::stable_graph::NodeIndex;

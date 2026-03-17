@@ -1,5 +1,5 @@
-use super::super::super::{task_mechanisms, task_type};
-use super::super::resolver_chain;
+use crate::engine::compiler::mechanism_dispatch::resolver_chain;
+use crate::engine::compiler::{task_mechanisms, task_type};
 
 pub(super) fn build(
     context: resolver_chain::DispatchContext<'_>,
